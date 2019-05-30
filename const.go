@@ -19,6 +19,7 @@ const (
 
 var LocationIDs = []string{
 	"ams01.ilandcloud.com",
+	"ams04.ilandcloud.com",
 	"dal02.ilandcloud.com",
 	"dal06.ilandcloud.com",
 	"dal22.ilandcloud.com",
@@ -32,5 +33,6 @@ var LocationIDs = []string{
 	"sin01.ilandcloud.com",
 	"str02.ilandcloud.com",
 	"str03.ilandcloud.com",
+	"str05.ilandcloud.com",
 	"syd02.ilandcloud.com",
 }
