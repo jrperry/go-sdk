@@ -51,3 +51,9 @@ func (s *taskService) Track(taskID string) (Task, error) {
 		}
 	}
 }
+
+func (s *taskService) Query(entityID, entityType string, childTasks bool) ([]Task, error) {
+	tasks := []Task{}
+	err := s.client.getObject(fmt.Sprintf("/v1/tasks?entityUuid=%s&entityType=%s&includeDescendantTasks=%t&sync=false&limit=10", entityID, entityType, childTasks), &tasks)
+	return tasks, err
+}

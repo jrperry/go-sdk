@@ -20,15 +20,25 @@ type client struct {
 	http            *http.Client
 }
 
+func InitClient(c *http.Client, accessToken string, expiration time.Time) (ConsoleService, error) {
+	return &client{
+		Token: Token{
+			AccessToken: accessToken,
+			ExpiresIn:   expiration.Unix(),
+		},
+		tokenExpiration: expiration,
+		http:            c,
+	}, nil
+}
+
 func NewClient(Username, Password, clientID, clientSecret string) (ConsoleService, error) {
-	client := client{
+	return &client{
 		username:     Username,
 		password:     Password,
 		clientID:     clientID,
 		clientSecret: clientSecret,
 		http:         &http.Client{},
-	}
-	return &client, nil
+	}, nil
 }
 
 func (c *client) Location() LocationService {
@@ -69,27 +79,30 @@ func (c *client) OrgVdcNetwork() OrgVdcNetworkService {
 
 func (c *client) VApp() VAppService {
 	return &vappService{c}
-
 }
 
 func (c *client) VAppNetwork() VAppNetworkService {
 	return &vappNetworkService{c}
-
 }
 
 func (c *client) VirtualMachine() VirtualMachineService {
 	return &virtualMachineService{c}
-
 }
 
 func (c *client) VCCBackupTenant() VCCBackupTenantService {
 	return &vccBackupTenantService{c}
+}
 
+func (c *client) VacTenant() VacTenantService {
+	return &vacTenantService{c}
 }
 
 func (c *client) Vpg() VpgService {
 	return &vpgService{c}
+}
 
+func (c *client) O365() O365Service {
+	return &o365Service{c}
 }
 
 func (c *client) Task() TaskService {

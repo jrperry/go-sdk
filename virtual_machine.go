@@ -232,15 +232,15 @@ type GuestCustomization struct {
 	ChangeSid             bool   `json:"change_sid"`
 	AdminPasswordEnabled  bool   `json:"admin_password_enabled"`
 	GenerateAdminPassword bool   `json:"admin_password_auto"`
-	AdminPassword         string `json:"admin_password"`
+	AdminPassword         string `json:"admin_password,omitempty"`
 	AdminAutoLoginEnabled bool   `json:"admin_auto_logon_enabled"`
 	AdminAutoLogonCount   int    `json:"admin_auto_logon_count"`
 	ResetPasswordRequired bool   `json:"reset_password_required"`
 	UseOrgSettings        bool   `json:"use_org_settings"`
 	JoinDomain            bool   `json:"join_domain"`
-	DomainName            string `json:"domain_name"`
-	DomainUserName        string `json:"domain_user_name"`
-	DomanUserPassword     string `json:"domain_user_password"`
+	DomainName            string `json:"domain_name,omitempty"`
+	DomainUserName        string `json:"domain_user_name,omitempty"`
+	DomanUserPassword     string `json:"domain_user_password,omitempty"`
 	MachineObjectOU       string `json:"machine_object_ou"`
 }
 
@@ -462,7 +462,6 @@ func (s *virtualMachineService) UpdateNics(virtualMachineID string, params []Nic
 	if err != nil {
 		return Task{}, err
 	}
-	fmt.Println(string(data))
 	return s.postAction(virtualMachineID, "update-vnics", data)
 }
 

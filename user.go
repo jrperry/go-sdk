@@ -34,6 +34,15 @@ func (s *userService) Get(username string) (User, error) {
 	return user, nil
 }
 
+func (s *userService) Delete(username string) error {
+	resp, err := s.client.Delete(fmt.Sprintf("/v1/users/%s", username))
+	if err != nil {
+		return err
+	}
+	resp.Close()
+	return nil
+}
+
 type UpdateUserParams struct {
 	FullName string `json:"fullname"`
 	Phone    string `json:"phone"`
@@ -109,4 +118,19 @@ func (s *userService) GetRole(username, companyID string) (Role, error) {
 func (s *userService) DeleteRole(username, companyID string) error {
 	_, err := s.client.Delete(fmt.Sprintf("/v1/users/%s/roles/%s", username, companyID))
 	return err
+}
+
+func (s *userService) GetUserCompanyVacTenants(username, companyID string) ([]VacTenant, error) {
+	schema := struct {
+		Tenants []VacTenant `json:"data"`
+	}{}
+	err := s.client.getObject(fmt.Sprintf("/v1/users/%s/companies/%s/vac-companies", username, companyID), &schema)
+	if err != nil {
+		return []VacTenant{}, err
+	}
+	return schema.Tenants, nil
+}
+
+func (s *userService) GetCompanyVacTenants(companyID string) ([]VacTenant, error) {
+	return s.GetUserCompanyVacTenants(s.client.username, companyID)
 }

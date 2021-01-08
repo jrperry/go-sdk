@@ -156,14 +156,7 @@ type BuildVirtualMachineParams struct {
 	VAppTemplateID           string           `json:"vapp_template_uuid"`
 	VirtualMachineTemplateID string           `json:"vm_template_uuid"`
 	StorageProfileID         string           `json:"storage_profile_uuid"`
-	CPUCount                 int              `json:"number_of_cpus,omitempty"`
-	CPUCoresPerSocket        int              `json:"cpu_cores_per_socket,omitempty"`
-	EnableCPUVirtualization  bool             `json:"expose_cpu_virtualization"`
-	MemoryMB                 int              `json:"ram,omitempty"`
-	HardwareVersion          int              `json:"hardware_version,omitempty"`
-	BootDelay                int              `json:"boot_delay,omitempty"`
-	Disks                    []Disk           `json:"disks"`
-	Nics                     []BuildNicParams `json:"nics"`
+	Nics                     []BuildNicParams `json:"vnics"`
 }
 
 type BuildNicParams struct {
@@ -367,15 +360,36 @@ type VAppStartupSetting struct {
 	StopDelay          int    `json:"stop_delay"`
 }
 
+type vappStartupSettings struct {
+	VMName        string `json:"vm_name"`
+	Order         int    `json:"order"`
+	StartupAction string `json:"startup_action"`
+	StopAction    string `json:"stop_action"`
+	StartDelay    int    `json:"start_delay"`
+	StopDelay     int    `json:"stop_delay"`
+}
+
 func (s *vappService) GetStartupSettings(vappID string) ([]VAppStartupSetting, error) {
 	schema := struct {
-		Settings []VAppStartupSetting `json:"data"`
+		Settings []vappStartupSettings `json:"data"`
 	}{}
 	err := s.client.getObject(fmt.Sprintf("/v1/vapps/%s/startup-section", vappID), &schema)
 	if err != nil {
 		return []VAppStartupSetting{}, err
 	}
-	return schema.Settings, nil
+	settings := []VAppStartupSetting{}
+	for _, s := range schema.Settings {
+		setting := VAppStartupSetting{
+			VirtualMachineName: s.VMName,
+			Order:              s.Order,
+			StartAction:        s.StartupAction,
+			StopAction:         s.StopAction,
+			StartDelay:         s.StartDelay,
+			StopDelay:          s.StopDelay,
+		}
+		settings = append(settings, setting)
+	}
+	return settings, nil
 }
 
 func (s *vappService) UpdateStartupSettings(vappID string, params []VAppStartupSetting) (Task, error) {

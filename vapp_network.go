@@ -112,14 +112,14 @@ type VAppNetworkFirewall struct {
 }
 
 type VAppNetworkFirewallRule struct {
-	ID                   string   `json:"id"`
+	ID                   string   `json:"id,omitempty"`
 	Index                int      `json:"rule_index"`
 	Description          string   `json:"description"`
 	Enabled              bool     `json:"enabled"`
 	LoggingEnabled       bool     `json:"logging_enabled"`
 	MatchOnTranslate     bool     `json:"match_on_translate"`
 	Policy               string   `json:"policy"`
-	Direction            string   `json:"direction"`
+	Direction            string   `json:"direction,omitempty"`
 	Protocols            []string `json:"protocols"`
 	SourceIP             string   `json:"source_ip"`
 	SourcePort           int      `json:"source_port"`
@@ -174,13 +174,13 @@ func (s *vappNetworkService) updateFirewall(vappNetworkID string, params VAppNet
 }
 
 type VAppNetworkNAT struct {
-	VAppID              string               `json:"vapp_uuid"`
-	NetworkName         string               `json:"network_name"`
-	Enabled             bool                 `json:"enabled"`
-	Type                string               `json:"type"`
-	IPMasquerade        bool                 `json:"enable_ip_masquerade"`
-	IPTranslationRules  []IPTranslationRule  `json:"ip_translation_rules"`
-	PortForwardingRules []PortForwardingRule `json:"port_forwarding_rules"`
+	VAppID              string                `json:"vapp_uuid"`
+	NetworkName         string                `json:"network_name"`
+	Enabled             bool                  `json:"enabled"`
+	Type                string                `json:"type"`
+	IPTranslationRules  *[]IPTranslationRule  `json:"ip_translation_rules,omitempty"`
+	PortForwardingRules *[]PortForwardingRule `json:"port_forwarding_rules,omitempty"`
+	EnabledMasquerade   bool                  `json:"enable_ip_masquerade"`
 }
 
 type IPTranslationRule struct {
@@ -221,7 +221,8 @@ func (s *vappNetworkService) UpdateNATIPTranslationRules(vappNetworkID string, r
 		return Task{}, err
 	}
 	nat.Type = "ipTranslation"
-	nat.IPTranslationRules = rules
+	nat.PortForwardingRules = &[]PortForwardingRule{}
+	nat.IPTranslationRules = &rules
 	return s.updateNAT(vappNetworkID, nat)
 }
 
@@ -230,9 +231,10 @@ func (s *vappNetworkService) UpdateNATPortForwardingRules(vappNetworkID string, 
 	if err != nil {
 		return Task{}, err
 	}
-	nat.Type = "portForwarding"
-	nat.IPMasquerade = true
-	nat.PortForwardingRules = rules
+	nat.Type = "PORT_FORWARDING"
+	nat.IPTranslationRules = &[]IPTranslationRule{}
+	nat.EnabledMasquerade = true
+	nat.PortForwardingRules = &rules
 	return s.updateNAT(vappNetworkID, nat)
 }
 

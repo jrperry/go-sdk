@@ -30,7 +30,9 @@ type ConsoleService interface {
 	VAppNetwork() VAppNetworkService
 	VirtualMachine() VirtualMachineService
 	VCCBackupTenant() VCCBackupTenantService
+	VacTenant() VacTenantService
 	Vpg() VpgService
+	O365() O365Service
 	Task() TaskService
 }
 
@@ -43,10 +45,19 @@ type LocationService interface {
 type TaskService interface {
 	Get(taskID string) (Task, error)
 	Track(taskID string) (Task, error)
+	Query(entityID, entityType string, childTasks bool) ([]Task, error)
 }
 
 type VCCBackupTenantService interface {
 	Get(vccBackupTenantID string) (VCCBackupTenant, error)
+}
+
+type VacTenantService interface {
+	Get(id string) (VacTenant, error)
+}
+
+type O365Service interface {
+	GetOrganization(id string) (O365Organization, error)
 }
 
 type CompanyService interface {
@@ -58,12 +69,18 @@ type CompanyService interface {
 	GetOrgs(companyID string) ([]Org, error)
 	GetLocationOrgs(companyID, locationID string) ([]Org, error)
 	GetVCCBackupTenants(companyID string) ([]VCCBackupTenant, error)
+	GetVacTenants(companyID string) ([]VacTenant, error)
+	GetLocationVacTenants(companyID, location string) ([]VacTenant, error)
+	GetInventory(companyID string) (CompanyInventory, error)
 }
 
 type UserService interface {
 	Get(username string) (User, error)
+	Delete(username string) error
 	Update(username string, params UpdateUserParams) (User, error)
 	GetCompanies(username string) ([]Company, error)
+	GetUserCompanyVacTenants(username, companyID string) ([]VacTenant, error)
+	GetCompanyVacTenants(companyID string) ([]VacTenant, error)
 	GetOrgs(username string) ([]Org, error)
 	AssignRole(username, companyID, roleID string) error
 	GetRole(username, companyID string) (Role, error)
@@ -85,6 +102,7 @@ type OrgService interface {
 	GetPublicIPAssignments(orgID string) ([]PublicIPAssignment, error)
 	GetCurrentBill(orgID string) (Billing, error)
 	GetBill(orgID string, month, year int) (Billing, error)
+	GetVCCFailoverPlans(orgID string) ([]VCCFailoverPlan, error)
 }
 
 type CatalogService interface {
@@ -125,12 +143,17 @@ type VdcService interface {
 
 type EdgeService interface {
 	Get(edgeID string) (Edge, error)
+	// GetFirewall(edgeID string) (EdgeFirewall, error)
+	// UpdateFirewallRules(edgeID string, rules []EdgeFirewallRule) (Task, error)
+	// GetNAT(edgeID string) (EdgeNAT, error)
+	// UpdateNATRules(edgeID string, rules []EdgeNATRule) (Task, error)
+	// EnableNAT(edgeID string) (Task, error)
+	// DisableNAT(edgeID string) (Task, error)
+
 	GetFirewall(edgeID string) (EdgeFirewall, error)
-	UpdateFirewallRules(edgeID string, rules []EdgeFirewallRule) (Task, error)
+	UpdateFirewall(edgeID string, firewall EdgeFirewall) (EdgeFirewall, error)
 	GetNAT(edgeID string) (EdgeNAT, error)
-	UpdateNATRules(edgeID string, rules []EdgeNATRule) (Task, error)
-	EnableNAT(edgeID string) (Task, error)
-	DisableNAT(edgeID string) (Task, error)
+	UpdateNAT(edgeID string, nat EdgeNAT) (EdgeNAT, error)
 }
 
 type OrgVdcNetworkService interface {

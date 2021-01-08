@@ -180,3 +180,14 @@ func (s *orgService) GetBill(vdcID string, month, year int) (Billing, error) {
 	}
 	return billing, nil
 }
+
+func (s *orgService) GetVCCFailoverPlans(orgID string) ([]VCCFailoverPlan, error) {
+	schema := struct {
+		VCCFailoverPlans []VCCFailoverPlan `json:"data"`
+	}{}
+	err := s.client.getObject(fmt.Sprintf("/v1/orgs/%s/vcc-failover-plans", orgID), &schema)
+	if err != nil {
+		return []VCCFailoverPlan{}, err
+	}
+	return schema.VCCFailoverPlans, nil
+}

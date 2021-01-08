@@ -78,7 +78,7 @@ func (c *client) getToken() error {
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode >= 300 {
-		return fmt.Errorf("Could not retrieve a token.")
+		return errors.New("Could not retrieve a token.")
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -107,7 +107,7 @@ func (c *client) refreshToken() error {
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode >= 300 {
-		return fmt.Errorf("Could not refresh current token.")
+		return errors.New("Could not refresh current token.")
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -194,5 +194,6 @@ func unmarshalBody(body io.ReadCloser, object interface{}) error {
 		return err
 	}
 	data = bytes.TrimPrefix(data, []byte(")]}'"))
+	fmt.Println(string(data))
 	return json.Unmarshal(data, object)
 }
