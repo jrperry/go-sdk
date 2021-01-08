@@ -194,6 +194,5 @@ func unmarshalBody(body io.ReadCloser, object interface{}) error {
 		return err
 	}
 	data = bytes.TrimPrefix(data, []byte(")]}'"))
-	fmt.Println(string(data))
 	return json.Unmarshal(data, object)
 }
