@@ -35,3 +35,37 @@ func (s *o365Service) GetOrganization(id string) (O365Organization, error) {
 	}
 	return org, nil
 }
+
+type O365User struct {
+	Name             string `json:"name"`
+	DisplayName      string `json:"display_name"`
+	OrganizationName string `json:"organization_name"`
+	OrganizationUUID string `json:"organization_uuid"`
+	Type             string `json:"type"`
+	NativeID         string `json:"native_id"`
+	BackedUp         bool   `json:"backed_up"`
+	DeletedFromOrg   bool   `json:"deleted_from_org"`
+}
+
+func (s *o365Service) GetUsers(id string) ([]O365User, error) {
+	schema := struct {
+		Data     []O365User `json:"data"`
+		Page     int        `json:"page"`
+		PageSize int        `json:"page_size"`
+	}{}
+	limit := 100
+	page := 0
+	users := []O365User{}
+	for {
+		err := s.client.getObject(fmt.Sprintf("/v1/o365-organizations/%s/users?pageSize=%d&page=%d", id, limit, page), &schema)
+		if err != nil {
+			return []O365User{}, err
+		}
+		users = append(users, schema.Data...)
+		if len(schema.Data) < limit {
+			break
+		}
+		page++
+	}
+	return users, nil
+}
