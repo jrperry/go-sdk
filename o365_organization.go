@@ -43,8 +43,8 @@ type O365User struct {
 	OrganizationUUID string `json:"organization_uuid"`
 	Type             string `json:"type"`
 	NativeID         string `json:"native_id"`
-	BackedUp         bool   `json:"backed_up"`
-	DeletedFromOrg   bool   `json:"deleted_from_org"`
+	BackedUp         bool   `json:"is_backed_up"`
+	DeletedFromOrg   bool   `json:"is_deleted_from_org"`
 }
 
 func (s *o365Service) GetUsers(id string) ([]O365User, error) {
