@@ -14,19 +14,19 @@ import (
 )
 
 func (c *client) Get(endpoint string) (io.ReadCloser, error) {
-	return c.request(endpoint, http.MethodGet, []byte{})
+	return c.requestJSON(endpoint, http.MethodGet, []byte{})
 }
 
 func (c *client) Post(endpoint string, body []byte) (io.ReadCloser, error) {
-	return c.request(endpoint, http.MethodPost, body)
+	return c.requestJSON(endpoint, http.MethodPost, body)
 }
 
 func (c *client) Put(endpoint string, body []byte) (io.ReadCloser, error) {
-	return c.request(endpoint, http.MethodPut, body)
+	return c.requestJSON(endpoint, http.MethodPut, body)
 }
 
 func (c *client) Delete(endpoint string) (io.ReadCloser, error) {
-	return c.request(endpoint, http.MethodDelete, []byte{})
+	return c.requestJSON(endpoint, http.MethodDelete, []byte{})
 }
 
 func (c *client) getObject(endpoint string, object interface{}) error {
@@ -127,7 +127,7 @@ func (c *client) setTokenExpiration() {
 	c.tokenExpiration = time.Now().Add(time.Duration(c.Token.ExpiresIn-60) * time.Second)
 }
 
-func (c *client) request(relPath, verb string, payload []byte) (io.ReadCloser, error) {
+func (c *client) request(relPath, verb, acceptHeader string, payload []byte) (io.ReadCloser, error) {
 	if c.Token.AccessToken == "" {
 		err := c.getToken()
 		if err != nil {
@@ -141,7 +141,7 @@ func (c *client) request(relPath, verb string, payload []byte) (io.ReadCloser, e
 	bytesJSON := bytes.NewBuffer(payload)
 	req, err := http.NewRequest(verb, fmt.Sprintf("https://%s%s", apiHostname, relPath), bytesJSON)
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", c.Token.AccessToken))
-	req.Header.Add("Accept", "application/vnd.ilandcloud.api.v1.0+json")
+	req.Header.Add("Accept", acceptHeader)
 	if verb == http.MethodPut || verb == http.MethodPost {
 		req.Header.Add("Content-Type", "application/json")
 	}
@@ -158,6 +158,10 @@ func (c *client) request(relPath, verb string, payload []byte) (io.ReadCloser, e
 		return nil, errors.New(http.StatusText(resp.StatusCode))
 	}
 	return resp.Body, nil
+}
+
+func (c *client) requestJSON(relPath, verb string, payload []byte) (io.ReadCloser, error) {
+	return c.request(relPath, verb, "application/vnd.ilandcloud.api.v1.0+json", payload)
 }
 
 func (c *client) RefreshTokenIfNecessary() error {

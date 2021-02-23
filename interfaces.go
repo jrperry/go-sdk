@@ -59,6 +59,7 @@ type VacTenantService interface {
 type O365Service interface {
 	GetOrganization(id string) (O365Organization, error)
 	GetUsers(id string) ([]O365User, error)
+	GetUserReport(id string) ([]byte, error)
 }
 
 type CompanyService interface {

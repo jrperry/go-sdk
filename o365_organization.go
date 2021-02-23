@@ -1,6 +1,10 @@
 package iland
 
-import "fmt"
+import (
+	"fmt"
+	"io/ioutil"
+	"net/http"
+)
 
 type o365Service struct {
 	client *client
@@ -68,4 +72,13 @@ func (s *o365Service) GetUsers(id string) ([]O365User, error) {
 		page++
 	}
 	return users, nil
+}
+
+func (s *o365Service) GetUserReport(id string) ([]byte, error) {
+	resp, err := s.client.request(fmt.Sprintf("/v1/o365-organizations/%s/users-export", id), http.MethodPost, "application/vnd.ilandcloud.api.v1.0+octet-stream", []byte{})
+	if err != nil {
+		return []byte{}, err
+	}
+	defer resp.Close()
+	return ioutil.ReadAll(resp)
 }
