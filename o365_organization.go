@@ -22,7 +22,6 @@ type O365Organization struct {
 	LastBackupTime  int    `json:"last_backup_time"`
 
 	TotalUsers               int `json:"total_users"`
-	TotalBackedUpUsers       int `json:"total_backedup_users"`
 	ProtectedActiveUsers     int `json:"protected_active_users"`
 	ProtectedInactiveUsers   int `json:"protected_inactive_users"`
 	TotalProtectedUsers      int `json:"total_protected_users"`
