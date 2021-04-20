@@ -141,6 +141,7 @@ type VdcService interface {
 	GetPerformance(vdcID string, counter PerformanceCounter, start, end time.Time) (Performance, error)
 	BuildVApp(vdcID string, params BuildVAppParams) (Task, error)
 	DeployVAppTemplate(vdcID string, params DeployVAppTemplateParams) (Task, error)
+	GetBackupStats(vdcID string) (VdcBackupStats, error)
 }
 
 type EdgeService interface {

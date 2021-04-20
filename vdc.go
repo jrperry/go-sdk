@@ -249,3 +249,22 @@ func (s *vdcService) DeployVAppTemplate(vdcID string, params DeployVAppTemplateP
 	}
 	return task, nil
 }
+
+type VdcBackupStats struct {
+	VdcUUID          string             `json:"vdc_uuid"`
+	Stats            BackupStats        `json:"stats"`
+	BackupGroupStats []BackupGroupStats `json:"backup_group_stats"`
+}
+
+func (s *vdcService) GetBackupStats(vdcID string) (VdcBackupStats, error) {
+	resp, err := s.client.Get(fmt.Sprintf("/v1/vdcs/%s/backup-group-summary-stats", vdcID))
+	if err != nil {
+		return VdcBackupStats{}, err
+	}
+	obj := VdcBackupStats{}
+	err = unmarshalBody(resp, &obj)
+	if err != nil {
+		return VdcBackupStats{}, err
+	}
+	return obj, nil
+}
